@@ -1,7 +1,7 @@
 [project]
 name = "edhrec-mcp"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "A Model Context Protocol (MCP) server providing tools to obtain information from edhrec.com using LLMs"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
