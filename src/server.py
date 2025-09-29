@@ -1,94 +1,144 @@
 from mcp.server.fastmcp import FastMCP
-from pyedhrec import EDHRec 
+from src.api_provider import edhrec
+import src.parser as parser
 
 mcp = FastMCP("EDHREC MCP")
-edhrec = EDHRec()
 
 @mcp.tool()
 def get_card_details(card_name: str):
-    """
-    Get relevant information about any Magic: the Gathering card by using EDHREC.com.
-    """
-    details = edhrec.get_card_details(card_name)
-	
-    return {
-        'scryfall_id': details['id'],
-        'name': details['name'],
-        'mana_cost': details['mana_cost'],
-        'type': details['type'],
-        'oracle_text': details['oracle_text'],
-        'legal_commander': details['legal_commander'],
-        'is_banned': details['banned']
-	}
+	"""
+	Get relevant information about any Magic: the Gathering card by using EDHREC.com.
+	"""
+	details = edhrec.get_card_details(card_name)
+	return parser.parse_commander(details)
 
 @mcp.tool()
 def get_card_combos(card_name: str):
-    return edhrec.get_card_combos(card_name)
+	"""
+	Get popular combos included in decks that use {card_name} as a commander from EDHREC.com.
+	"""
+	combos = edhrec.get_card_combos(card_name)['container']['json_dict']['cardlists']
+	return [{
+		'rank': combo['combo']['rank'],
+		'results': combo['combo']['results'],
+		'cards': [parser.parse_card(card) for card in combo['cardviews']],
+		'prevalence': combo['combo']['percentage']
+	} for combo in combos]
 
 @mcp.tool()
-def get_commander_data(card_name: str):
-    return edhrec.get_commander_data(card_name)
-
-@mcp.tool()
-def get_commander_cards(card_name: str):
-    return edhrec.get_commander_cards(card_name)
+def get_similar_commanders(card_name: str):
+	"""
+	Get commanders similar to {card_name} from EDHREC.com.
+	"""
+	similar = edhrec.get_commander_data(card_name)['similar']
+	return [parser.parse_commander(card) for card in similar]
 
 @mcp.tool()
 def get_commanders_average_deck(card_name: str):
-    return edhrec.get_commanders_average_deck(card_name)
-
-@mcp.tool()
-def get_commander_decks(card_name: str):
-    return edhrec.get_commander_decks(card_name)
+	"""
+	Get the average decklist for decks that use {card_name} as a commander from EDHREC.com.
+	"""
+	return edhrec.get_commanders_average_deck(card_name)['decklist']
 
 @mcp.tool()
 def get_new_cards(card_name: str):
-    return edhrec.get_new_cards(card_name)
+	"""
+	Get recently released cards that have a high inclusion rate in decks that use {card_name} as a commander from EDHREC.com.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_new_cards(card_name)['New Cards']]
 
 @mcp.tool()
 def get_high_synergy_cards(card_name: str):
-    return edhrec.get_high_synergy_cards(card_name)
+	"""
+	Get cards with high synergy in decks that use {card_name} as a commander from EDHREC.com.
+	Synergy is calculated as [% of decks including the card for decks using {card_name} as a commander] - [% of decks including the card for all decks it can be included in].
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_high_synergy_cards(card_name)['High Synergy Cards']]
 
 @mcp.tool()
 def get_top_cards(card_name: str):
-    return edhrec.get_top_cards(card_name)
+	"""
+	Get the cards with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards and high synergy cards.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_cards(card_name)['Top Cards']]
 
 @mcp.tool()
 def get_top_creatures(card_name: str):
-    return edhrec.get_top_creatures(card_name)
+	"""
+	Get the creatures with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_creatures(card_name)['Creatures']]
 
 @mcp.tool()
 def get_top_instants(card_name: str):
-    return edhrec.get_top_instants(card_name)
+	"""
+	Get the instants with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_instants(card_name)['Instants']]
 
 @mcp.tool()
 def get_top_sorceries(card_name: str):
-    return edhrec.get_top_sorceries(card_name)
+	"""
+	Get the sorceries with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_sorceries(card_name)['Sorceries']]
 
 @mcp.tool()
 def get_top_enchantments(card_name: str):
-    return edhrec.get_top_enchantments(card_name)
+	"""
+	Get the enchantments with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_enchantments(card_name)['Enchantments']]
 
 @mcp.tool()
 def get_top_artifacts(card_name: str):
-    return edhrec.get_top_artifacts(card_name)
+	"""
+	Get the artifacts with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, mana-producing artifacts ("mana rocks") and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_artifacts(card_name)['Artifacts']]
 
 @mcp.tool()
 def get_top_mana_artifacts(card_name: str):
-    return edhrec.get_top_mana_artifacts(card_name)
+	"""
+	Get the mana-producing artifacts ("mana rocks") with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_mana_artifacts(card_name)['Mana Artifacts']]
 
 @mcp.tool()
 def get_top_battles(card_name: str):
-    return edhrec.get_top_battles(card_name)
+	"""
+	Get the battles with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_battles(card_name)['Battles']]
 
 @mcp.tool()
 def get_top_planeswalkers(card_name: str):
-    return edhrec.get_top_planeswalkers(card_name)
+	"""
+	Get the planeswalkers with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_planeswalkers(card_name)['Planeswalkers']]
 
 @mcp.tool()
 def get_top_utility_lands(card_name: str):
-    return edhrec.get_top_utility_lands(card_name)
+	"""
+	Get the utility lands with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_utility_lands(card_name)['Utility Lands']]
 
 @mcp.tool()
 def get_top_lands(card_name: str):
-    return edhrec.get_top_lands(card_name)
+	"""
+	Get the lands with the highest rate of inclusion in decks that use {card_name} as a commander from EDHREC.com.
+	Excludes game changers, new cards, high synergy cards, utility lands, and cards that have a high rate of inclusion in decks that use {card_name} as a commander.
+	"""
+	return [parser.parse_card_with_inclusion(card) for card in edhrec.get_top_lands(card_name)['Lands']]
