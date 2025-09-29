@@ -23,3 +23,6 @@ def parse_card_with_inclusion(card):
 		'included_decks': card['num_decks'],
 		'potential_decks': card['potential_decks'],
 	}
+
+def sanitize_card_name(card_name: str):
+	return card_name.strip().replace('.', '')
