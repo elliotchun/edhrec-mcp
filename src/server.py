@@ -10,7 +10,7 @@ def get_card_details(card_name: str):
 	Get relevant information about any Magic: the Gathering card by using EDHREC.com.
 	"""
 	details = edhrec.get_card_details(parser.sanitize_card_name(card_name))
-	return parser.parse_commander(details)
+	return parser.parse_details(details)
 
 @mcp.tool()
 def get_card_combos(card_name: str):
@@ -31,7 +31,7 @@ def get_similar_commanders(card_name: str):
 	Get commanders similar to {card_name} from EDHREC.com.
 	"""
 	similar = edhrec.get_commander_data(parser.sanitize_card_name(card_name))['similar']
-	return [parser.parse_commander(card) for card in similar]
+	return [parser.parse_card(card) for card in similar]
 
 @mcp.tool()
 def get_commanders_average_deck(card_name: str):

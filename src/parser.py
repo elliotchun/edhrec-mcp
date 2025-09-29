@@ -4,7 +4,7 @@ def parse_card(card):
 		'name': card['name']
 	}
 
-def parse_commander(card):
+def parse_details(card):
 	return {
 		'scryfall_id': card['id'],
 		'name': card['name'],
