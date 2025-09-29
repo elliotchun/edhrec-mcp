@@ -6,11 +6,20 @@ edhrec = EDHRec()
 
 @mcp.tool()
 def get_card_details(card_name: str):
-    return edhrec.get_card_details(card_name)    
-
-@mcp.tool()
-def get_card_list(card_name: str):
-    return edhrec.get_card_list(card_name)
+    """
+    Get relevant information about any Magic: the Gathering card by using EDHREC.com.
+    """
+    details = edhrec.get_card_details(card_name)
+	
+    return {
+        'scryfall_id': details['id'],
+        'name': details['name'],
+        'mana_cost': details['mana_cost'],
+        'type': details['type'],
+        'oracle_text': details['oracle_text'],
+        'legal_commander': details['legal_commander'],
+        'is_banned': details['banned']
+	}
 
 @mcp.tool()
 def get_card_combos(card_name: str):
