@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
-from src.api_provider import edhrec
-import src.parser as parser
+from api_provider import edhrec
+import parser as parser
 
 mcp = FastMCP("EDHREC MCP")
 
@@ -15,7 +15,7 @@ def get_card_details(card_name: str):
 @mcp.tool()
 def get_card_combos(card_name: str):
 	"""
-	Get popular combos included in decks that use {card_name} as a commander from EDHREC.com.
+	Get a list of the popular combos included in decks that use {card_name} as a commander from EDHREC.com.
 	"""
 	combos = edhrec.get_card_combos(parser.sanitize_card_name(card_name))['container']['json_dict']['cardlists']
 	return [{

@@ -8,3 +8,13 @@ dependencies = [
     "mcp[cli]>=1.15.0",
     "pyedhrec==0.0.2",
 ]
+
+[project.urls]
+Repository = "https://github.com/elliotchun/edhrec-mcp"
+
+[project.scripts]
+edhrec-mcp = "main:main"
+
+[build-system]
+requires = ["setuptools>=78.1.0", "wheel>=0.45.1"]
+build-backend = "setuptools.build_meta"

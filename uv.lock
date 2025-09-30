@@ -97,7 +97,7 @@ wheels = [
 [[package]]
 name = "edhrec-mcp"
 version = "1.0.3"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "mcp", extra = ["cli"] },
     { name = "pyedhrec" },
